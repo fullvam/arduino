@@ -122,5 +122,7 @@ void loop() {
         }
       }
     }
+  } else {
+    delay(1);
   }
 }
