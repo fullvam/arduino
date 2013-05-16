@@ -9,15 +9,15 @@ unsigned long last_report;
 
 void setup() {
   int i;
-  
+
   Serial.begin(115200);
-  
+
   for (i = 0; i < 8; i++) {
     pinMode(pins[i], INPUT);
     values[i] = new Bounce(pins[i], 5);
     values[i]->write(LOW);
   }
-  
+
   last_report = millis();
 }
 
@@ -34,7 +34,7 @@ void loop() {
 
   now = millis();
   elapsed = now - last_report;
-   
+
   if (elapsed >= INTERVAL || (report && elapsed >= DELAY)) {
     int value = 0;
 
@@ -49,7 +49,7 @@ void loop() {
       Serial.print(value);
       Serial.println(" }");
     }
-    
+
     last_report = now;
     report = false;
   }
