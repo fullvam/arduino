@@ -29,7 +29,7 @@ enum state {
 char *names[NUM] = { "LEFT", "RIGHT" };
 unsigned char cmds[NUM] = { 'l', 'r' };
 int pins[NUM] = { 3, 12 };
-int pulses[NUM];
+unsigned int pulses[NUM];
 state state[NUM];
 unsigned long ts[NUM];
 
@@ -103,10 +103,6 @@ void loop() {
           }
           break;
       }
-    } else {
-      digitalWrite(pins[i], LOW);
-      pulses[i] = 0;
-      state[i] = idle;
     }
   }
 
