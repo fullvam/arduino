@@ -1,9 +1,10 @@
 #include <Bounce.h>
 #define INTERVAL 992
 #define DELAY 100
+#define NUM 8
 
-int pins[8] = { 2, 3, 4, 5, 6, 7, 8, 9 };
-Bounce *values[8] = {};
+int pins[NUM] = { 2, 3, 4, 5, 6, 7, 8, 9 };
+Bounce *values[NUM] = {};
 int report = false;
 unsigned long last_report;
 
@@ -12,7 +13,7 @@ void setup() {
 
   Serial.begin(115200);
 
-  for (i = 0; i < 8; i++) {
+  for (i = 0; i < NUM; i++) {
     pinMode(pins[i], INPUT);
     values[i] = new Bounce(pins[i], 5);
     values[i]->write(LOW);
@@ -29,7 +30,7 @@ void loop() {
   while (!Serial)
     last_report = millis();
 
-  for (i = 0; i < 8; i++)
+  for (i = 0; i < NUM; i++)
     report |= values[i]->update();
 
   now = millis();
@@ -38,7 +39,7 @@ void loop() {
   if (elapsed >= INTERVAL || (report && elapsed >= DELAY)) {
     int value = 0;
 
-    for (i = 0; i < 8; i++)
+    for (i = 0; i < NUM; i++)
       if (values[i]->read())
         value |= (1 << i);
 
