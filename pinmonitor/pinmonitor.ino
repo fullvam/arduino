@@ -32,10 +32,11 @@ void setup() {
   Serial.begin(115200);
 
   for (i = 0; i < NUM; i++) {
-    pinMode(pins[i], INPUT);
+    pinMode(pins[i], INPUT_PULLUP);
     values[i] = new Bounce(pins[i], 5);
-    values[i]->write(LOW);
+    values[i]->write(HIGH);
   }
+  delay(5);
 
   last_report = millis();
 }
@@ -58,7 +59,7 @@ void loop() {
     int value = 0;
 
     for (i = 0; i < NUM; i++)
-      if (values[i]->read())
+      if (!values[i]->read())
         value |= (1 << i);
 
     if (Serial) {
