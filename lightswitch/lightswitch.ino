@@ -25,11 +25,13 @@ enum state {
 #define NUM 2
 #define PULSE_ON 200
 #define PULSE_OFF 300
+#define STATUS_CMD 's'
 
 char *names[NUM] = { "LEFT", "RIGHT" };
 unsigned char cmds[NUM] = { 'l', 'r' };
 int pins[NUM] = { 3, 12 };
 unsigned int pulses[NUM];
+unsigned int total[NUM];
 state state[NUM];
 unsigned long ts[NUM];
 
@@ -42,6 +44,7 @@ void setup() {
     digitalWrite(pins[i], LOW);
     pinMode(pins[i], OUTPUT);
     pulses[i] = 0;
+    total[i] = 0;
     state[i] = idle;
   }
 }
@@ -92,6 +95,7 @@ void loop() {
             }
 
             pulses[i]--;
+            total[i]++;
 
             if (Serial) {
               Serial.print(millis());
@@ -119,6 +123,40 @@ void loop() {
               Serial.print(names[i]);
               Serial.print(" ++pulses = ");
               Serial.println(pulses[i]);
+        }
+      }
+    }
+
+    if (data == STATUS_CMD) {
+      for (i = 0; i < NUM; i++) {
+        if (Serial) {
+              Serial.print(millis());
+              Serial.print(" ");
+              Serial.print(names[i]);
+              Serial.print(" pulses=");
+              Serial.print(pulses[i]);
+              Serial.print(" ts=");
+              Serial.print(ts[i]);
+              Serial.print(" state=");
+              switch (state[i]) {
+                case idle:
+                  Serial.print("idle");
+                  break;
+
+                case pulse_on:
+                  Serial.print("pulse_on");
+                  break;
+
+                case pulse_off:
+                  Serial.print("pulse_off");
+                  break;
+
+                default:
+                  Serial.print(state[i]);
+                  break;
+              }
+              Serial.print(" total=");
+              Serial.println(total[i]);
         }
       }
     }
