@@ -1,6 +1,6 @@
 /*
-	pinmonitor - Monitor the status of pins with serial output in a JSON format
-	Copyright 2013  Simon Arlott
+	pinmonitor - Monitor the status of pins with serial output
+	Copyright 2013-2014  Simon Arlott
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -18,11 +18,13 @@
 
 #include <Bounce.h>
 #define INTERVAL 992
-#define DELAY 100
-#define NUM 8
+#define DELAY 1
+#define NUM 11
+#define DEBOUNCE 5
 
-int pins[NUM] = { 2, 3, 4, 5, 6, 7, 8, 9 };
+int pins[NUM] = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
 Bounce *values[NUM] = {};
+unsigned long ts[NUM] = {};
 int report = false;
 unsigned long last_report;
 
@@ -33,10 +35,10 @@ void setup() {
 
   for (i = 0; i < NUM; i++) {
     pinMode(pins[i], INPUT_PULLUP);
-    values[i] = new Bounce(pins[i], 5);
+    values[i] = new Bounce(pins[i], DEBOUNCE);
     values[i]->write(HIGH);
   }
-  delay(5);
+  delay(DEBOUNCE);
 
   last_report = millis();
 }
@@ -49,8 +51,9 @@ void loop() {
   while (!Serial)
     last_report = millis();
 
-  for (i = 0; i < NUM; i++)
+  for (i = 0; i < NUM; i++) {
     report |= values[i]->update();
+  }
 
   now = millis();
   elapsed = now - last_report;
@@ -63,11 +66,8 @@ void loop() {
         value |= (1 << i);
 
     if (Serial) {
-      Serial.print("{ \"now\": ");
-      Serial.print(now);
-      Serial.print(", \"value\": ");
-      Serial.print(value);
-      Serial.println(" }");
+      Serial.print("V");
+      Serial.println(value);
     }
 
     last_report = now;
