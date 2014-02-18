@@ -17,7 +17,7 @@
 */
 
 #include <Bounce.h>
-#define INTERVAL 992
+#define INTERVAL 4992
 #define DELAY 1
 #define NUM 11
 #define DEBOUNCE 5
@@ -49,7 +49,7 @@ void loop() {
   int i;
 
   while (!Serial)
-    last_report = millis();
+    last_report = millis() - INTERVAL;
 
   for (i = 0; i < NUM; i++) {
     report |= values[i]->update();
