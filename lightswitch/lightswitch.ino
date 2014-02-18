@@ -1,6 +1,6 @@
 /*
 	lightswitch - Apply pulses to light switch impulse latching relays from serial input
-	Copyright 2013  Simon Arlott
+	Copyright 2013-2014  Simon Arlott
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -28,12 +28,14 @@ enum state {
 #define STATUS_CMD 's'
 
 char *names[NUM] = { "LEFT", "RIGHT" };
-unsigned char cmds[NUM] = { 'l', 'r' };
+unsigned char vcmds[NUM] = { 'l', 'r' };
+unsigned char scmds[NUM] = { 'L', 'R' };
 int pins[NUM] = { 3, 12 };
 unsigned int pulses[NUM];
 unsigned int total[NUM];
 state state[NUM];
 unsigned long ts[NUM];
+boolean verbose[NUM];
 
 void setup() {
   int i;
@@ -46,6 +48,7 @@ void setup() {
     pulses[i] = 0;
     total[i] = 0;
     state[i] = idle;
+    verbose[i] = false;
   }
 }
 
@@ -60,7 +63,7 @@ void loop() {
           ts[i] = millis();
           state[i] = pulse_on;
 
-          if (Serial) {
+          if (verbose[i] && Serial) {
             Serial.print(millis());
             Serial.print(" ");
             Serial.print(names[i]);
@@ -74,7 +77,7 @@ void loop() {
             ts[i] = millis();
             state[i] = pulse_off;
 
-            if (Serial) {
+            if (verbose[i] && Serial) {
               Serial.print(millis());
               Serial.print(" ");
               Serial.print(names[i]);
@@ -87,7 +90,7 @@ void loop() {
           if (millis() - ts[i] >= PULSE_OFF) {
             state[i] = idle;
 
-            if (Serial) {
+            if (verbose[i] && Serial) {
               Serial.print(millis());
               Serial.print(" ");
               Serial.print(names[i]);
@@ -97,12 +100,16 @@ void loop() {
             pulses[i]--;
             total[i]++;
 
-            if (Serial) {
+            if (verbose[i] && Serial) {
               Serial.print(millis());
               Serial.print(" ");
               Serial.print(names[i]);
               Serial.print(" --pulses = ");
               Serial.println(pulses[i]);
+            }
+
+            if (pulses[i] == 0) {
+              verbose[i] = false;
             }
           }
           break;
@@ -114,8 +121,9 @@ void loop() {
     int data = Serial.read();
 
     for (i = 0; i < NUM; i++) {
-      if (data == cmds[i]) {
+      if (data == vcmds[i]) {
         pulses[i]++;
+        verbose[i] = true;
 
         if (Serial) {
               Serial.print(millis());
@@ -124,6 +132,10 @@ void loop() {
               Serial.print(" ++pulses = ");
               Serial.println(pulses[i]);
         }
+      }
+
+      if (data == scmds[i]) {
+        pulses[i]++;
       }
     }
 
