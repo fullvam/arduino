@@ -23,6 +23,7 @@
 #define DEBOUNCE 5
 
 int pins[NUM] = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+int active[NUM] = { LOW, HIGH, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW };
 Bounce *values[NUM] = {};
 unsigned long ts[NUM] = {};
 int report = false;
@@ -45,7 +46,6 @@ void setup() {
 
 void loop() {
   unsigned long now, elapsed = 0;
-  int tmp;
   int i;
 
   while (!Serial)
@@ -61,9 +61,10 @@ void loop() {
   if (elapsed >= INTERVAL || (report && elapsed >= DELAY)) {
     int value = 0;
 
-    for (i = 0; i < NUM; i++)
-      if (!values[i]->read())
+    for (i = 0; i < NUM; i++) {
+      if (values[i]->read() == active[i])
         value |= (1 << i);
+    }
 
     if (Serial) {
       Serial.print("V");
