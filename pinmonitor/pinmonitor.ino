@@ -23,7 +23,7 @@
 #define DEBOUNCE 5
 
 int pins[NUM] = { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-int active[NUM] = { LOW, HIGH, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW };
+int active[NUM] = { LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW, LOW };
 Bounce *values[NUM] = {};
 unsigned long ts[NUM] = {};
 int report = false;
